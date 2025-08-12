@@ -102,6 +102,10 @@ average_scores = filtered_df.groupby('Restaurant')[categories].mean()
 average_weighted_ranking = filtered_df.groupby('Restaurant')['Weighted Ranking'].mean()
 average_scores['Average Weighted Ranking'] = average_weighted_ranking
 
+# Display the average scores in a table
+st.subheader("Average Scores per Restaurant")
+st.dataframe(average_scores)
+
 # Create a bar chart with average weighted rankings sort from highest to lowest by restaurant
 st.subheader("Average Weighted Rankings")
 bar_fig = go.Figure()
@@ -121,14 +125,26 @@ bar_fig.update_layout(
 )
 st.plotly_chart(bar_fig)
 
-# Display the average scores in a table
-st.subheader("Average Scores per Restaurant")
-st.dataframe(average_scores)
-
 # Display the average food quality for each restaurant
 st.subheader("Average Food Quality by Restaurant")
 average_food_quality = filtered_df.groupby('Restaurant')['Food Quality (0 - 10)'].mean().sort_values(ascending=False)
-st.bar_chart(average_food_quality, use_container_width=True)
+
+# Create bar chart with labels using plotly
+fig = go.Figure()
+fig.add_trace(go.Bar(
+    x=average_food_quality.index,
+    y=average_food_quality.values,
+    text=average_food_quality.values.round(2),
+    textposition='auto',
+    marker_color='lightblue'
+))
+fig.update_layout(
+    title='Average Food Quality by Restaurant',
+    xaxis_title='Restaurant',
+    yaxis_title='Food Quality Score',
+    yaxis=dict(range=[0, 10])
+)
+st.plotly_chart(fig)
 
 # Main app content
 st.title("Restaurant Ranking Spider Plot")
