@@ -102,9 +102,11 @@ average_scores = filtered_df.groupby('Restaurant')[categories].mean()
 average_weighted_ranking = filtered_df.groupby('Restaurant')['Weighted Ranking'].mean()
 average_scores['Average Weighted Ranking'] = average_weighted_ranking
 
-# Display the average scores in a table
+# Display the average scores in a table with weighted ranking first
 st.subheader("Average Scores per Restaurant")
-st.dataframe(average_scores)
+# Reorder columns to put Average Weighted Ranking first
+cols = ['Average Weighted Ranking'] + [col for col in average_scores.columns if col != 'Average Weighted Ranking']
+st.dataframe(average_scores[cols])
 
 # Create a bar chart with average weighted rankings sort from highest to lowest by restaurant
 st.subheader("Average Weighted Rankings")
