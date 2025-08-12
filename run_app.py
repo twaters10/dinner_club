@@ -2,8 +2,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import boto3
 import io
+import s3fs
 
 # Define S3 Bucket and file key
 BUCKET_NAME = "dinner-club-tsw"
@@ -17,19 +17,29 @@ cols_to_display = ['Food Quality (0 - 10)',
                     'Service (0 - 10)',
                     'Drinks (0 - 10)']
 
-# Initialize S3 Client
-s3_client = boto3.client('s3')
+# Use st.secrets to access your AWS credentials
+try:
+    aws_access_key_id = st.secrets["aws"]["aws_access_key_id"]
+    aws_secret_access_key = st.secrets["aws"]["aws_secret_access_key"]
+except KeyError:
+    st.error("AWS credentials not found in secrets.toml. Please configure them.")
+    st.stop()
 
-# Create response object from S3
-response = s3_client.get_object(Bucket=BUCKET_NAME, Key=FILE_KEY)
+# Create an S3 filesystem object using the retrieved credentials
+# s3fs handles the authentication for you
+s3 = s3fs.S3FileSystem(key=aws_access_key_id, secret=aws_secret_access_key)
 
-# Read the content of the object
-body = response['Body']
-csv_string = body.read().decode('utf-8') # Decode bytes to string, assuming UTF-8
-print(csv_string)
+try:
+    # Construct the full S3 path
+    s3_path = f"s3://{BUCKET_NAME}/{FILE_KEY}"
+    
+    # Use pandas to read the CSV file directly from S3
+    # The 'storage_options' argument is used to pass the credentials to pandas
+    df = pd.read_csv(s3_path, storage_options=s3.storage_options)
 
-# --- Read the CSV using pandas from the string in memory ---
-df = pd.read_csv(io.StringIO(csv_string))
+except Exception as e:
+    st.error(f"An error occurred: {e}")
+    st.info("Please double-check your S3 bucket name, file key, and AWS permissions.")
 
 # Get unique restaurants and respondents
 restaurants = df['Restaurant'].unique()
