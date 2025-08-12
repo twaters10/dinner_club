@@ -155,11 +155,6 @@ st.title("Restaurant Ranking Spider Plot")
 fig = create_spider_plot(filtered_df)
 st.plotly_chart(fig)
 
-# Display the weighted ranking by respondent and restaurant with an overall averaged weighting ranking as the first column
-st.subheader("Weighted Ranking by Respondent and Restaurant")
-weighted_ranking_df = filtered_df.groupby(['Respondent Name', 'Restaurant'])['Weighted Ranking'].mean().reset_index()
-weighted_ranking_df = weighted_ranking_df.sort_values(by='Weighted Ranking', ascending=False)
-st.dataframe(weighted_ranking_df)
 # Create a pivot table with respondents as rows and restaurants as columns
 pivot_df = filtered_df.pivot_table(
     index='Respondent Name',
