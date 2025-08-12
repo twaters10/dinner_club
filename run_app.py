@@ -197,7 +197,7 @@ if st.checkbox("Show Raw Data"):
 # Footer
 st.markdown("""
 ---
-*Developed by Your Taylor Waters*
+*Developed by You*
 """)
 
 
