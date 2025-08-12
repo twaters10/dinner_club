@@ -158,11 +158,27 @@ st.subheader("Weighted Ranking by Respondent and Restaurant")
 weighted_ranking_df = filtered_df.groupby(['Respondent Name', 'Restaurant'])['Weighted Ranking'].mean().reset_index()
 weighted_ranking_df = weighted_ranking_df.sort_values(by='Weighted Ranking', ascending=False)
 st.dataframe(weighted_ranking_df)
-# Display the average scores for each category
-st.subheader("Average Scores for Each Category")
-average_category_scores = filtered_df[categories].mean().reset_index()
-average_category_scores.columns = ['Category', 'Average Score']
-st.dataframe(average_category_scores)
+# Create a pivot table with respondents as rows and restaurants as columns
+pivot_df = filtered_df.pivot_table(
+    index='Respondent Name',
+    columns='Restaurant',
+    values='Weighted Ranking',
+    aggfunc='mean'
+)
+
+# Calculate the average ranking across all restaurants for each respondent
+pivot_df['Average Rating'] = pivot_df.mean(axis=1)
+
+# Reorder columns to put Average Rating first
+cols = ['Average Rating'] + [col for col in pivot_df.columns if col != 'Average Rating']
+pivot_df = pivot_df[cols]
+
+# Sort by Average Rating descending
+pivot_df = pivot_df.sort_values('Average Rating', ascending=False)
+
+# Display the pivot table
+st.subheader("Respondent Rankings by Restaurant")
+st.dataframe(pivot_df)
 
 
 # Display raw data if checkbox is selected
