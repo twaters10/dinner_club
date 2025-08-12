@@ -2,7 +2,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import io
 import s3fs
 
 # Define S3 Bucket and file key
