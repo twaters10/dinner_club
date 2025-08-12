@@ -113,6 +113,39 @@ average_scores['Average Weighted Ranking'] = average_weighted_ranking
 st.subheader("Average Scores per Restaurant")
 st.dataframe(average_scores)
 
+# Create a bar chart with average weighted rankings sort from highest to lowest by restaurant
+st.subheader("Average Weighted Rankings")
+bar_fig = go.Figure()
+sorted_rankings = average_weighted_ranking.sort_values(ascending=False)
+bar_fig.add_trace(go.Bar(
+    x=sorted_rankings.index,
+    y=sorted_rankings.values,
+    marker_color='indianred'
+))
+bar_fig.update_layout(
+    title='Average Weighted Rankings by Restaurant',
+    xaxis_title='Restaurant',
+    yaxis_title='Average Weighted Ranking',
+    yaxis=dict(range=[0, 10])
+)
+st.plotly_chart(bar_fig)
+# Display raw data if checkbox is selected
+if st.checkbox("Show Raw Data"):
+    st.subheader("Raw Data")
+    st.dataframe(filtered_df)
+    csv = filtered_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Download data as CSV",
+        data=csv,
+        file_name='filtered_restaurant_rankings.csv',
+        mime='text/csv',
+    )
+# Footer
+st.markdown("""
+---
+*Developed by Your Taylor Waters*
+""")
+
 
 
 
