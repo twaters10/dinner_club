@@ -97,21 +97,10 @@ def create_spider_plot(df):
     )
     return fig
 
-# Main app content
-st.title("Restaurant Ranking Spider Plot")
-
-# Create and display the spider plot
-fig = create_spider_plot(filtered_df)
-st.plotly_chart(fig)
-
 # Calculate average scores per category and overall weighted ranking
 average_scores = filtered_df.groupby('Restaurant')[categories].mean()
 average_weighted_ranking = filtered_df.groupby('Restaurant')['Weighted Ranking'].mean()
 average_scores['Average Weighted Ranking'] = average_weighted_ranking
-
-# Display the average scores in a table
-st.subheader("Average Scores per Restaurant")
-st.dataframe(average_scores)
 
 # Create a bar chart with average weighted rankings sort from highest to lowest by restaurant
 st.subheader("Average Weighted Rankings")
@@ -120,7 +109,9 @@ sorted_rankings = average_weighted_ranking.sort_values(ascending=False)
 bar_fig.add_trace(go.Bar(
     x=sorted_rankings.index,
     y=sorted_rankings.values,
-    marker_color='indianred'
+    marker_color='indianred',
+    text=sorted_rankings.values.round(2),  # Add text labels rounded to 2 decimal places
+    textposition='auto'  # Position labels automatically above bars
 ))
 bar_fig.update_layout(
     title='Average Weighted Rankings by Restaurant',
@@ -129,6 +120,35 @@ bar_fig.update_layout(
     yaxis=dict(range=[0, 10])
 )
 st.plotly_chart(bar_fig)
+
+# Display the average scores in a table
+st.subheader("Average Scores per Restaurant")
+st.dataframe(average_scores)
+
+# Display the average food quality for each restaurant
+st.subheader("Average Food Quality by Restaurant")
+average_food_quality = filtered_df.groupby('Restaurant')['Food Quality (0 - 10)'].mean().sort_values(ascending=False)
+st.bar_chart(average_food_quality, use_container_width=True)
+
+# Main app content
+st.title("Restaurant Ranking Spider Plot")
+
+# Create and display the spider plot
+fig = create_spider_plot(filtered_df)
+st.plotly_chart(fig)
+
+# Display the weighted ranking by respondent and restaurant with an overall averaged weighting ranking as the first column
+st.subheader("Weighted Ranking by Respondent and Restaurant")
+weighted_ranking_df = filtered_df.groupby(['Respondent Name', 'Restaurant'])['Weighted Ranking'].mean().reset_index()
+weighted_ranking_df = weighted_ranking_df.sort_values(by='Weighted Ranking', ascending=False)
+st.dataframe(weighted_ranking_df)
+# Display the average scores for each category
+st.subheader("Average Scores for Each Category")
+average_category_scores = filtered_df[categories].mean().reset_index()
+average_category_scores.columns = ['Category', 'Average Score']
+st.dataframe(average_category_scores)
+
+
 # Display raw data if checkbox is selected
 if st.checkbox("Show Raw Data"):
     st.subheader("Raw Data")
