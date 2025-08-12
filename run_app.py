@@ -194,6 +194,14 @@ if st.checkbox("Show Raw Data"):
         file_name='filtered_restaurant_rankings.csv',
         mime='text/csv',
     )
+    
+# Word Cloud from Notes column
+# st.subheader("Notes Word Cloud")
+# from wordcloud import WordCloud
+# from io import BytesIO
+# notes = ' '.join(filtered_df['Notes'].dropna().astype(str).tolist())
+# wordcloud = WordCloud(width=800, height=400, background_color='white').generate(notes)
+# st.image(wordcloud.to_array(), use_column_width=True)
 # Footer
 st.markdown("""
 ---
